@@ -25,7 +25,15 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
 
-      "io.kamon" %% "kamon-bundle" % "2.4.7",
-      "io.kamon" %% "kamon-jaeger" % "2.4.7"
+      "io.kamon" %% "kamon-bundle" % "2.4.8",
+      "io.kamon" %% "kamon-jaeger" % "2.4.8",
+      "io.kamon" %% "kamon-jdbc" % "2.4.8",
+      //slick
+      "com.typesafe.slick" %% "slick" % "3.3.3",
+      "org.slf4j" % "slf4j-nop" % "1.6.4",
+      "com.typesafe.slick" %% "slick-hikaricp" % "3.3.3",
+      "mysql" % "mysql-connector-java" % "8.0.9-rc",
+
+
     )
   )

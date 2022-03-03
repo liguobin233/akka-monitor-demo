@@ -6,8 +6,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import kamon.Kamon
 
-import scala.util.Failure
-import scala.util.Success
+import scala.util.{Failure, Success}
+import slick.jdbc.MySQLProfile.api._
 
 //#main-class
 object QuickstartApp {
@@ -25,12 +25,17 @@ object QuickstartApp {
         system.log.error("Failed to bind HTTP endpoint, terminating system", ex)
         system.terminate()
     }
+
+
   }
+
+  var db: Database = null
 
   //#start-http-server
   def main(args: Array[String]): Unit = {
     Kamon.init()
     //#server-bootstrapping
+    db = Database.forConfig("mysqllocal")
 
     val rootBehavior = Behaviors.setup[Nothing] { context =>
       val userRegistryActor = context.spawn(UserRegistry(), "UserRegistryActor")

@@ -1,13 +1,14 @@
 package com.example
 
-import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.example.UserRegistry._
+import com.example.dao.BotCommandDao
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -42,54 +43,70 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
   //#all-routes
   //#users-get-post
   //#users-get-delete
-  val userRoutes: Route =
-  pathPrefix("users2") {
-    concat(
+  val userRoutes: Route = {
+    pathPrefix("users2") {
+      concat(
+        //#users-get-delete
+        pathEnd {
+          concat(
+            get {
+              //trace日志
+              system.log.info("log test 4 traceId and spanId")
+              //http请求
+              //              http()
+              //mysql
+              system.log.info("mysql")
+              mysql()
+              //akka actor
+              val result = complete(getUsers())
+              result
+            },
+            post {
+              entity(as[User]) { user =>
+                onSuccess(createUser(user)) { performed =>
+                  complete((StatusCodes.Created, performed))
+                }
+              }
+            })
+        },
+        //#users-get-delete
+        //#users-get-post
+        path(Segment) { name =>
+          concat(
+            get {
+              //#retrieve-user-info
+              rejectEmptyResponse {
+                onSuccess(getUser(name)) { response =>
+                  complete(response.maybeUser)
+                }
+              }
+              //#retrieve-user-info
+            },
+            delete {
+              //#users-delete-logic
+              onSuccess(deleteUser(name)) { performed =>
+                complete((StatusCodes.OK, performed))
+              }
+              //#users-delete-logic
+            })
+        })
       //#users-get-delete
-      pathEnd {
-        concat(
-          get {
-            system.log.info("log test 4 traceId and spanId")
-            val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(uri = "http://akka.io"))
-            implicit val executionContext = system.executionContext
-            responseFuture
-              .onComplete {
-                case Success(res) => println(res)
-                case Failure(_) => sys.error("something wrong")
-              }
-            val result = complete(getUsers())
-            result
-          },
-          post {
-            entity(as[User]) { user =>
-              onSuccess(createUser(user)) { performed =>
-                complete((StatusCodes.Created, performed))
-              }
-            }
-          })
-      },
-      //#users-get-delete
-      //#users-get-post
-      path(Segment) { name =>
-        concat(
-          get {
-            //#retrieve-user-info
-            rejectEmptyResponse {
-              onSuccess(getUser(name)) { response =>
-                complete(response.maybeUser)
-              }
-            }
-            //#retrieve-user-info
-          },
-          delete {
-            //#users-delete-logic
-            onSuccess(deleteUser(name)) { performed =>
-              complete((StatusCodes.OK, performed))
-            }
-            //#users-delete-logic
-          })
-      })
-    //#users-get-delete
+    }
+  }
+
+  def http(): Unit = {
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(uri = "http://akka.io"))
+    implicit val executionContext = system.executionContext
+    responseFuture
+      .onComplete {
+        case Success(res) => println(res)
+        case Failure(_) => sys.error("something wrong")
+      }
+  }
+
+  def mysql(): Unit = {
+    BotCommandDao.queryAll()
+    BotCommandDao.queryById(10)
   }
   //#all-routes
 }
