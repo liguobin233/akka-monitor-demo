@@ -8,9 +8,10 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.example.UserRegistry._
-import com.example.dao.BotCommandDao
+import com.example.dao.AssetCom
 
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 //#import-json-formats
@@ -56,7 +57,7 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
               //              http()
               //mysql
               system.log.info("mysql")
-              mysql()
+              Test.mysql()
               //akka actor
               val result = complete(getUsers())
               result
@@ -104,9 +105,14 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
       }
   }
 
-  def mysql(): Unit = {
-    BotCommandDao.queryAll()
-    BotCommandDao.queryById(10)
+  object Test extends AssetCom {
+    def mysql(): Unit = {
+      import slick.jdbc.MySQLProfile.api._
+      Await.result(QuickstartApp.db.run(AssetTable.filter(_.assetCode === "btc").result), Duration.Inf)
+    }
+
+    override val profile = slick.jdbc.MySQLProfile
   }
+
   //#all-routes
 }

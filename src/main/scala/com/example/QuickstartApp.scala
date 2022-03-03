@@ -4,10 +4,11 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
+import com.typesafe.config.ConfigFactory
 import kamon.Kamon
+import slick.jdbc.JdbcBackend.Database
 
 import scala.util.{Failure, Success}
-import slick.jdbc.MySQLProfile.api._
 
 //#main-class
 object QuickstartApp {
@@ -35,7 +36,7 @@ object QuickstartApp {
   def main(args: Array[String]): Unit = {
     Kamon.init()
     //#server-bootstrapping
-    db = Database.forConfig("mysqllocal")
+    db = initDb
 
     val rootBehavior = Behaviors.setup[Nothing] { context =>
       val userRegistryActor = context.spawn(UserRegistry(), "UserRegistryActor")
@@ -48,6 +49,42 @@ object QuickstartApp {
     }
     val system = ActorSystem[Nothing](rootBehavior, "HelloAkkaHttpServer")
     //#server-bootstrapping
+  }
+
+  def initDb(): Database = {
+    val driver = "com.mysql.jdbc.Driver"
+    val server = "127.0.0.1:3318"
+    val dbName = "trace"
+
+    val parameters = Map(
+      "cachePrepStmts" -> "true",
+      "prepStmtCacheSize" -> "250",
+      "prepStmtCacheSqlLimit" -> "2048",
+      "useServerPrepStmts" -> "true",
+      "useLocalSessionState" -> "true",
+      "rewriteBatchedStatements" -> "true",
+      "cacheResultSetMetadata" -> "true",
+      "cacheServerConfiguration" -> "true",
+      "elideSetAutoCommits" -> "true",
+      "maintainTimeStats" -> "false",
+      "allowPublicKeyRetrieval" -> "true", // to get around com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Public Key Retrieval is not allowed
+      "useSSL" -> "false", // @dev: this should only be used for development.
+      "useUnicode" -> "yes", // MySQL table has to be set to charset of utf family as well
+      "characterEncoding" -> "UTF-8" // e.g. "alter table <TB> convert to CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+    ).map(a => s"${a._1}=${a._2}").mkString("&")
+    val url = s"jdbc:mysql://$server/$dbName?$parameters"
+    val configMap = Map[String, Any](
+      "dataSourceClass" -> "slick.jdbc.DriverDataSource",
+      "driverClassName" -> driver,
+      "user" -> "root",
+      "password" -> "root",
+      "numThreads" -> 20,
+      "properties.driver" -> driver,
+      "properties.url" -> url,
+      "connectionTimeout" -> 30000,
+      "validationTimeout" -> 5000
+    )
+    Database.forConfig("", ConfigFactory.parseMap(collection.JavaConverters.mapAsJavaMap(configMap)))
   }
 }
 //#main-class
