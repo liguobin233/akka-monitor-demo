@@ -31,6 +31,7 @@ object QuickstartApp {
   def main(args: Array[String]): Unit = {
     Kamon.init()
     //#server-bootstrapping
+
     val rootBehavior = Behaviors.setup[Nothing] { context =>
       val userRegistryActor = context.spawn(UserRegistry(), "UserRegistryActor")
       context.watch(userRegistryActor)
