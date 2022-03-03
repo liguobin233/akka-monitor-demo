@@ -1,18 +1,15 @@
 package com.example
 
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
-import akka.http.scaladsl.server.Route
-
-import scala.concurrent.Future
-import com.example.UserRegistry._
-import akka.actor.typed.ActorRef
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.util.Timeout
-import kamon.Kamon
+import com.example.UserRegistry._
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 //#import-json-formats
@@ -21,15 +18,17 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
 
   //#user-routes-class
 
-  import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
   import JsonFormats._
+  import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
   //#import-json-formats
 
   // If ask takes more time than this to complete the request is failed
   private implicit val timeout = Timeout.create(system.settings.config.getDuration("my-app.routes.ask-timeout"))
 
-  def getUsers(): Future[Users] =
+  def getUsers(): Future[Users] = {
+    system.log.info("log test 4 traceId and spanId")
     userRegistry.ask(GetUsers)
+  }
 
   def getUser(name: String): Future[GetUserResponse] =
     userRegistry.ask(GetUser(name, _))
@@ -50,8 +49,7 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
       pathEnd {
         concat(
           get {
-            val span = Kamon.serverSpanBuilder("/userstag", "http").start()
-            span.tag("mofei", "mofei")
+            system.log.info("log test 4 traceId and spanId")
             val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(uri = "http://akka.io"))
             implicit val executionContext = system.executionContext
             responseFuture
@@ -60,7 +58,6 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
                 case Failure(_) => sys.error("something wrong")
               }
             val result = complete(getUsers())
-            span.finish()
             result
           },
           post {

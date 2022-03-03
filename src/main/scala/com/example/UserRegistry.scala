@@ -1,32 +1,44 @@
 package com.example
 
 //#user-registry-actor
+
 import akka.actor.typed.ActorRef
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
+import org.slf4j.LoggerFactory
+
 import scala.collection.immutable
 
 //#user-case-classes
 final case class User(name: String, age: Int, countryOfResidence: String)
+
 final case class Users(users: immutable.Seq[User])
 //#user-case-classes
 
 object UserRegistry {
   // actor protocol
   sealed trait Command
+
   final case class GetUsers(replyTo: ActorRef[Users]) extends Command
+
   final case class CreateUser(user: User, replyTo: ActorRef[ActionPerformed]) extends Command
+
   final case class GetUser(name: String, replyTo: ActorRef[GetUserResponse]) extends Command
+
   final case class DeleteUser(name: String, replyTo: ActorRef[ActionPerformed]) extends Command
 
   final case class GetUserResponse(maybeUser: Option[User])
+
   final case class ActionPerformed(description: String)
 
   def apply(): Behavior[Command] = registry(Set.empty)
 
+  val log = LoggerFactory.getLogger("com.myservice.BackendTask")
+
   private def registry(users: Set[User]): Behavior[Command] =
     Behaviors.receiveMessage {
       case GetUsers(replyTo) =>
+        log.info("log test 4 traceId and spanId")
         replyTo ! Users(users.toSeq)
         Behaviors.same
       case CreateUser(user, replyTo) =>
