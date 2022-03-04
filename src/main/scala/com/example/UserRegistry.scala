@@ -5,9 +5,12 @@ package com.example
 import akka.actor.typed.ActorRef
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
+import com.example.dao.AssetCom
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 //#user-case-classes
 final case class User(name: String, age: Int, countryOfResidence: String)
@@ -39,6 +42,7 @@ object UserRegistry {
     Behaviors.receiveMessage {
       case GetUsers(replyTo) =>
         log.info("log test 4 traceId and spanId")
+        Test.mysql()
         replyTo ! Users(users.toSeq)
         Behaviors.same
       case CreateUser(user, replyTo) =>
@@ -51,5 +55,14 @@ object UserRegistry {
         replyTo ! ActionPerformed(s"User $name deleted.")
         registry(users.filterNot(_.name == name))
     }
+}
+
+object Test extends AssetCom {
+  def mysql(): Unit = {
+    import slick.jdbc.MySQLProfile.api._
+    Await.result(QuickstartApp.db.run(AssetTable.filter(_.assetCode === "btc").result), Duration.Inf)
+  }
+
+  override val profile = slick.jdbc.MySQLProfile
 }
 //#user-registry-actor

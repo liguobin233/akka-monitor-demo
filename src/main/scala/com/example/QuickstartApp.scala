@@ -30,15 +30,15 @@ object QuickstartApp {
 
   }
 
+  Kamon.init()
   var db: Database = null
 
   //#start-http-server
   def main(args: Array[String]): Unit = {
-    Kamon.init()
-    //#server-bootstrapping
-    db = initDb
 
+    //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>
+      db = initDb
       val userRegistryActor = context.spawn(UserRegistry(), "UserRegistryActor")
       context.watch(userRegistryActor)
 
@@ -52,7 +52,7 @@ object QuickstartApp {
   }
 
   def initDb(): Database = {
-    val driver = "com.mysql.jdbc.Driver"
+    val driver = "com.mysql.cj.jdbc.Driver"
     val server = "127.0.0.1:3318"
     val dbName = "trace"
 
