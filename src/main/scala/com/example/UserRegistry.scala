@@ -5,6 +5,7 @@ package com.example
 import akka.actor.typed.ActorRef
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
+import com.example.config.RedisConfig
 import com.example.dao.AssetCom
 import org.slf4j.LoggerFactory
 
@@ -43,6 +44,8 @@ object UserRegistry {
       case GetUsers(replyTo) =>
         log.info("log test 4 traceId and spanId")
         Test.mysql()
+        RedisConfig.jedisPooled.set("monitor", "monitor")
+        RedisConfig.jedisPooled.get("monitor")
         replyTo ! Users(users.toSeq)
         Behaviors.same
       case CreateUser(user, replyTo) =>

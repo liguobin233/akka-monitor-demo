@@ -32,7 +32,9 @@ lazy val root = (project in file(".")).
       "com.typesafe.slick" %% "slick" % "3.3.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
       "mysql" % "mysql-connector-java" % "8.0.9-rc",
-      "org.xerial" % "sqlite-jdbc" % "3.23.1"
+      "org.xerial" % "sqlite-jdbc" % "3.23.1",
+      //redis
+      "redis.clients" % "jedis" % "4.1.1"
 
     )
   )
