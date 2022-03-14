@@ -12,10 +12,10 @@ import org.apache.kafka.common.serialization.StringSerializer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-object Kafka {
+object KafkaProducer {
   implicit val actorSystem: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, "alpakka-samples")
 
-  def test(): Unit = {
+  def produce(): Unit = {
     val producerSettings =
       ProducerSettings(actorSystem.classicSystem, new StringSerializer, new StringSerializer)
         .withBootstrapServers("127.0.0.1:9092")

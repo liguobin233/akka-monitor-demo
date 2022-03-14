@@ -7,7 +7,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import com.example.config.RedisConfig
 import com.example.dao.AssetCom
-import com.example.kafka.Kafka
+import com.example.kafka.KafkaProducer
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable
@@ -48,7 +48,7 @@ object UserRegistry {
         RedisConfig.jedisPooled.set("monitor", "monitor")
         RedisConfig.jedisPooled.get("monitor")
         replyTo ! Users(users.toSeq)
-        Kafka.test()
+        KafkaProducer.produce()
         Behaviors.same
       case CreateUser(user, replyTo) =>
         replyTo ! ActionPerformed(s"User ${user.name} created.")
