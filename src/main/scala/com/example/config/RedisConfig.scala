@@ -1,13 +1,13 @@
 package com.example.config
 
+import redis.clients.jedis.Jedis
+
 object RedisConfig {
+  val jedisPooled: Jedis = initJedis()
 
-  import redis.clients.jedis.JedisPooled
-
-  val jedisPooled: JedisPooled = initJedis()
-
-  def initJedis(): JedisPooled = {
-    val jedis = new JedisPooled("localhost", 6379)
+  def initJedis(): Jedis = {
+    import redis.clients.jedis.Jedis
+    val jedis = new Jedis("localhost")
     jedis
   }
 }
