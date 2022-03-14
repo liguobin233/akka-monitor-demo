@@ -20,6 +20,9 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,
       "com.typesafe.akka" %% "akka-stream" % akkaVersion,
       "ch.qos.logback" % "logback-classic" % "1.2.3",
+      //kafka
+      "com.typesafe.akka" %% "akka-stream-kafka" % "2.0.5",
+
 
       "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
@@ -34,7 +37,9 @@ lazy val root = (project in file(".")).
       "mysql" % "mysql-connector-java" % "8.0.9-rc",
       "org.xerial" % "sqlite-jdbc" % "3.23.1",
       //redis
-      "redis.clients" % "jedis" % "4.1.1"
+      "redis.clients" % "jedis" % "4.1.1",
+      //kafka
+
 
     )
   )

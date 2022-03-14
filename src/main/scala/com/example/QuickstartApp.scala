@@ -4,8 +4,10 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
+import akka.kafka.ProducerSettings
 import com.typesafe.config.ConfigFactory
 import kamon.Kamon
+import org.apache.kafka.common.serialization.StringSerializer
 import slick.jdbc.JdbcBackend.Database
 
 import scala.util.{Failure, Success}
@@ -85,6 +87,13 @@ object QuickstartApp {
       "validationTimeout" -> 5000
     )
     Database.forConfig("", ConfigFactory.parseMap(collection.JavaConverters.mapAsJavaMap(configMap)))
+  }
+
+  def initKafka(system: ActorSystem[_]): Unit = {
+    val config = system.settings.config.getConfig("akka.kafka.producer")
+    val producerSettings =
+      ProducerSettings(config, new StringSerializer, new StringSerializer)
+        .withBootstrapServers("127.0.0.1:9002")
   }
 }
 //#main-class
