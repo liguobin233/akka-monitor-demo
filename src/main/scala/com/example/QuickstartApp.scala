@@ -1,15 +1,18 @@
 package com.example
 
+import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.kafka.ProducerSettings
+import com.example.grpc.GreeterServer
 import com.typesafe.config.ConfigFactory
 import kamon.Kamon
 import org.apache.kafka.common.serialization.StringSerializer
 import slick.jdbc.JdbcBackend.Database
 
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 //#main-class
@@ -50,6 +53,17 @@ object QuickstartApp {
       Behaviors.empty
     }
     val system = ActorSystem[Nothing](rootBehavior, "HelloAkkaHttpServer")
+    system.systemActorOf(
+      Behaviors.setup[Done] { implicit ctx =>
+        implicit val executionContext: ExecutionContext = ctx.executionContext
+        GreeterServer.start(system) onComplete {
+          case Failure(e) => println(s"grpc server exception caught:: $e")
+          case Success(_) => println("binding grpc future completed")
+        }
+        Behaviors.receiveMessage { case Done => Behaviors.stopped }
+      },
+      "grpc-bind"
+    )
     //#server-bootstrapping
   }
 
