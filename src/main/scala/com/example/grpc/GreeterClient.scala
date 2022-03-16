@@ -16,6 +16,7 @@ object GreeterClient {
   def main(args: Array[String]): Unit = {
     implicit val sys: ActorSystem[_] = ActorSystem(Behaviors.empty, "GreeterClient")
     implicit val ec: ExecutionContext = sys.executionContext
+    
 
     val client = GreeterServiceClient(GrpcClientSettings.fromConfig("helloworld.GreeterService").withTls(false))
 
