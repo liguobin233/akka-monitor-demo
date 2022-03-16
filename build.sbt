@@ -31,6 +31,7 @@ lazy val root = (project in file(".")).
       "io.kamon" %% "kamon-bundle" % "2.4.8",
       "io.kamon" %% "kamon-jaeger" % "2.4.8",
       "io.kamon" %% "kamon-status-page" % "2.4.8",
+      "io.kamon" %% "kamon-prometheus" % "2.4.8",
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
