@@ -8,6 +8,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import com.example.config.RedisConfig
 import com.example.dao.AssetCom
 import com.example.kafka.KafkaProducer
+import kamon.Kamon
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable
@@ -43,6 +44,7 @@ object UserRegistry {
   private def registry(users: Set[User]): Behavior[Command] =
     Behaviors.receiveMessage {
       case GetUsers(replyTo) =>
+        Kamon.currentSpan()
         log.info("log test 4 traceId and spanId")
         Test.mysql()
         RedisConfig.jedisPooled.set("monitor", "monitor")

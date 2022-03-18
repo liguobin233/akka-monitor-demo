@@ -33,6 +33,7 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
   def getUser(name: String): Future[GetUserResponse] =
     userRegistry.ask(GetUser(name, _))
 
+
   def createUser(user: User): Future[ActionPerformed] =
     userRegistry.ask(CreateUser(user, _))
 
