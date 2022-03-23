@@ -50,7 +50,7 @@ object UserRegistry {
         RedisConfig.jedisPooled.set("monitor", "monitor")
         RedisConfig.jedisPooled.get("monitor")
         replyTo ! Users(users.toSeq)
-        KafkaProducer.produce()
+        //        KafkaProducer.produce()
         Behaviors.same
       case CreateUser(user, replyTo) =>
         replyTo ! ActionPerformed(s"User ${user.name} created.")
