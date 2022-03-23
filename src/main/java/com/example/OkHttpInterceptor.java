@@ -21,9 +21,13 @@ public class OkHttpInterceptor implements Interceptor {
                 .tagMetrics("http.method", request.method())
                 .tagMetrics("operation", request.url().pathSegments().stream().reduce("", (left, right) -> left + "/" + right))
                 .tagMetrics("path", request.url().toString()).start().takeSamplingDecision();
-        Request traceRequest = request.newBuilder().addHeader("X-Request-ID", span.id().string()).build();
+        Request traceRequest = request.newBuilder()
+                .addHeader("x-trace-id", span.trace().id().toString())
+                .addHeader("x-span-id", span.id().string())
+                .build();
         Response response = chain.proceed(traceRequest);
         span.tagMetrics("http.status_code", response.code());
+        span.tagMetrics("remote.trace-id", response.header("trace-id"));
 
         span.finish();
         return response;

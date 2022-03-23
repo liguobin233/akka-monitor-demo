@@ -8,8 +8,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.example.UserRegistry._
-import okhttp3.{Request, Response}
+import okhttp3.{Protocol, Request, Response}
 
+import java.util
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
@@ -108,11 +109,14 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
 
   import okhttp3.OkHttpClient
 
-  val client = new OkHttpClient.Builder().addInterceptor(new OkHttpInterceptor).build()
+  val client = new OkHttpClient
+  .Builder()
+    .protocols(util.Arrays.asList(Protocol.H2_PRIOR_KNOWLEDGE))
+    .addInterceptor(new OkHttpInterceptor).build()
 
   def http2(): String = {
 
-    val request: Request = new Request.Builder().url("http://127.0.0.1:8080/users2/mofei").build()
+    val request: Request = new Request.Builder().url("http://127.0.0.1:8080/users2").build()
     val response: Response = null
     try {
       val response = client.newCall(request).execute
