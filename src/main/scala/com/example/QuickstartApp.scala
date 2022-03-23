@@ -8,6 +8,7 @@ import akka.http.scaladsl.server.Route
 import akka.kafka.ProducerSettings
 import com.example.grpc.GreeterServer
 import com.typesafe.config.ConfigFactory
+import io.demo.GrpcServer
 import kamon.Kamon
 import org.apache.kafka.common.serialization.StringSerializer
 import slick.jdbc.JdbcBackend.Database
@@ -31,7 +32,17 @@ object QuickstartApp {
         system.log.error("Failed to bind HTTP endpoint, terminating system", ex)
         system.terminate()
     }
+  }
 
+  private def startJavaGrpc(): Unit = {
+    val server = new GrpcServer
+    try {
+      server.start()
+      server.blockUntilShutdown()
+    } catch {
+      case th: Throwable =>
+        th.getCause()
+    }
 
   }
 
@@ -65,6 +76,8 @@ object QuickstartApp {
       },
       "grpc-bind"
     )
+
+    startJavaGrpc()
     //#server-bootstrapping
   }
 

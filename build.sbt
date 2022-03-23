@@ -41,9 +41,14 @@ lazy val root = (project in file(".")).
       "mysql" % "mysql-connector-java" % "8.0.9-rc",
       "org.xerial" % "sqlite-jdbc" % "3.23.1",
       //redis
-      "redis.clients" % "jedis" % "3.3.0"
+      "redis.clients" % "jedis" % "3.3.0",
       //kafka
 
 
+      //java-grpc
+      "io.grpc" % "grpc-netty-shaded" % "1.29.0",
+      "io.grpc" % "grpc-protobuf" % "1.29.0",
+      "io.grpc" % "grpc-stub" % "1.29.0",
+      "org.apache.tomcat" % "annotations-api" % "6.0.53",
     )
   )
