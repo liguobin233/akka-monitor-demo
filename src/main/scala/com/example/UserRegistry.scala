@@ -54,6 +54,7 @@ object UserRegistry {
         replyTo ! ActionPerformed(s"User ${user.name} created.")
         registry(users + user)
       case GetUser(name, replyTo) =>
+
         replyTo ! GetUserResponse(users.find(_.name == name))
         Behaviors.same
       case DeleteUser(name, replyTo) =>

@@ -8,6 +8,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.example.UserRegistry._
+import okhttp3.{Request, Response}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -53,7 +54,7 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
               //trace日志
               system.log.info("log test 4 traceId and spanId")
               //http请求
-              http()
+              system.log.info(s"http2:${http2()}")
               //mysql
               system.log.info("mysql")
               Test.mysql()
@@ -95,6 +96,7 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
   }
 
   def http(): Unit = {
+    Http().connectionTo("127.0.0.1").toPort(8081).http2()
     val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(uri = "http://akka.io"))
     implicit val executionContext = system.executionContext
     responseFuture
@@ -102,6 +104,26 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
         case Success(res) => println(res)
         case Failure(_) => sys.error("something wrong")
       }
+  }
+
+  import okhttp3.OkHttpClient
+
+  val client = new OkHttpClient.Builder().addInterceptor(new OkHttpInterceptor).build()
+
+  def http2(): String = {
+
+    val request: Request = new Request.Builder().url("http://127.0.0.1:8080/users2/mofei").build()
+    val response: Response = null
+    try {
+      val response = client.newCall(request).execute
+      response.body.string
+    } catch {
+      case ex: Throwable =>
+        ex.printStackTrace()
+        ""
+    } finally {
+      if (response != null) response.close()
+    }
   }
 
 
