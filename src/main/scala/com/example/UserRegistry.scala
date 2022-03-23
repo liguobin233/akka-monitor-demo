@@ -2,12 +2,10 @@ package com.example
 
 //#user-registry-actor
 
-import akka.actor.typed.ActorRef
-import akka.actor.typed.Behavior
+import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
 import com.example.config.RedisConfig
 import com.example.dao.AssetCom
-import com.example.kafka.KafkaProducer
 import kamon.Kamon
 import org.slf4j.LoggerFactory
 
