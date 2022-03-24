@@ -47,7 +47,7 @@ object UserRegistry {
         Test.mysql()
         RedisConfig.jedisPooled.set("monitor", "monitor")
         RedisConfig.jedisPooled.get("monitor")
-        replyTo ! Users(users.toSeq)
+        replyTo ! Users(users.to[collection.immutable.Seq])
         //        KafkaProducer.produce()
         Behaviors.same
       case CreateUser(user, replyTo) =>

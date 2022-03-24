@@ -13,7 +13,7 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "com.example",
-      scalaVersion := "2.13.4"
+      scalaVersion := "2.12.15"
     )),
     name := "akka-http-quickstart-scala",
     libraryDependencies ++= Seq(
@@ -32,7 +32,7 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
 
-      "io.kamon" %% "kamon-bundle" % "2.5.0",
+      "io.kamon" %% "kamon-bundle" % "2.5.0+0-f1014737-dirty",
       "io.kamon" %% "kamon-jaeger" % "2.5.0",
       "io.kamon" %% "kamon-status-page" % "2.5.0",
       //slick
