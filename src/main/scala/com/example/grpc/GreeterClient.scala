@@ -6,6 +6,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.grpc.GrpcClientSettings
 import akka.stream.scaladsl.Source
 import com.example.grpc.helloworld.{GreeterServiceClient, HelloReply, HelloRequest}
+import kamon.Kamon
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,9 +15,10 @@ import scala.util.{Failure, Success}
 object GreeterClient {
 
   def main(args: Array[String]): Unit = {
+    Kamon.init()
     implicit val sys: ActorSystem[_] = ActorSystem(Behaviors.empty, "GreeterClient")
     implicit val ec: ExecutionContext = sys.executionContext
-    
+
 
     val client = GreeterServiceClient(GrpcClientSettings.fromConfig("helloworld.GreeterService").withTls(false))
 

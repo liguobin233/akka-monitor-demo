@@ -10,6 +10,7 @@ fork := true
 enablePlugins(AkkaGrpcPlugin)
 
 lazy val root = (project in file(".")).
+  enablePlugins(JavaAgent).
   settings(
     inThisBuild(List(
       organization := "com.example",
@@ -32,9 +33,19 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
 
-      "io.kamon" %% "kamon-bundle" % "2.5.0+0-f1014737-dirty",
+
+      "io.kamon" %% "kamon-core" % "2.5.0",
+      "io.kamon" %% "kamon-akka" % "2.5.0",
+      "io.kamon" %% "kamon-system-metrics" % "2.5.0",
+      "io.kamon" %% "kamon-executors" % "2.5.0",
+      "io.github.mofei100" % "kamon-akka-http_2.12" % "2.5.1+2-7b25e9b2" exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
+      "io.kamon" %% "kamon-jdbc" % "2.5.0",
+      "io.kamon" %% "kamon-kafka" % "2.5.0",
+      "io.kamon" %% "kamon-logback" % "2.5.0",
       "io.kamon" %% "kamon-jaeger" % "2.5.0",
       "io.kamon" %% "kamon-status-page" % "2.5.0",
+      "io.kamon" %% "kamon-akka-grpc" % "2.5.0+4-7d0e780a-dirty",
+      "io.kamon" %% "kamon-redis" % "2.5.0",
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
