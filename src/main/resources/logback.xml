@@ -18,7 +18,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d | %traceID %spanID | %m%n</pattern>
+            <pattern>%d | %traceID %spanID | %contextEntry{parentTraceId} | %m%n</pattern>
         </encoder>
     </appender>
 
