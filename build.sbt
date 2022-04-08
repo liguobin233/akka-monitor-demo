@@ -38,13 +38,13 @@ lazy val root = (project in file(".")).
       "io.kamon" %% "kamon-akka" % "2.5.0",
       "io.kamon" %% "kamon-system-metrics" % "2.5.0",
       "io.kamon" %% "kamon-executors" % "2.5.0",
-      "io.github.mofei100" % "kamon-akka-http_2.12" % "2.5.1+2-7b25e9b2" exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
+      "io.kamon" %% "kamon-akka-http" % "2.5.0+8-7bb0fb9d" exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
       "io.kamon" %% "kamon-jdbc" % "2.5.0",
       "io.kamon" %% "kamon-kafka" % "2.5.0",
       "io.kamon" %% "kamon-logback" % "2.5.0",
       "io.kamon" %% "kamon-jaeger" % "2.5.0",
       "io.kamon" %% "kamon-status-page" % "2.5.0",
-      "io.kamon" %% "kamon-akka-grpc" % "2.5.0+4-7d0e780a-dirty",
+      "io.kamon" %% "kamon-akka-grpc" % "2.5.0+7-2651730d",
       "io.kamon" %% "kamon-redis" % "2.5.0",
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",
@@ -54,7 +54,7 @@ lazy val root = (project in file(".")).
       //redis
       "redis.clients" % "jedis" % "3.3.0",
       //okhttp
-      "com.squareup.okhttp3" % "okhttp" % "4.9.3"
+      "com.squareup.okhttp3" % "okhttp" % "4.9.2"
 
 
     )

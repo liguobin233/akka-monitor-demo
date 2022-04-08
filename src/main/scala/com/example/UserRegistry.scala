@@ -6,6 +6,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
 import com.example.config.RedisConfig
 import com.example.dao.AssetCom
+import com.example.grpc.GreeterClient
 import kamon.Kamon
 import org.slf4j.LoggerFactory
 
@@ -43,6 +44,8 @@ object UserRegistry {
     Behaviors.receiveMessage {
       case GetUsers(replyTo) =>
         Kamon.currentSpan()
+        GreeterClient.get()
+
         log.info("log test 4 traceId and spanId")
         Test.mysql()
         RedisConfig.jedisPooled.set("monitor", "monitor")
