@@ -44,7 +44,7 @@ object UserRegistry {
     Behaviors.receiveMessage {
       case GetUsers(replyTo) =>
         Kamon.currentSpan()
-        GreeterClient.get()
+
 
         log.info("log test 4 traceId and spanId")
         Test.mysql()

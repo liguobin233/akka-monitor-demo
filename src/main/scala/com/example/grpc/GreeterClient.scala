@@ -6,6 +6,7 @@ import akka.grpc.GrpcClientSettings
 import akka.stream.scaladsl.Source
 import akka.{Done, NotUsed}
 import com.example.grpc.helloworld.{GreeterServiceClient, HelloReply, HelloRequest}
+import kamon.Kamon
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -62,6 +63,12 @@ object GreeterClient {
     //#client-stream
     //#client-request-reply
 
+  }
+
+  Kamon.init()
+
+  def main(args: Array[String]): Unit = {
+    get()
   }
 
 }

@@ -3,8 +3,10 @@ package com.example.grpc
 import akka.NotUsed
 import akka.actor.typed.ActorSystem
 import akka.stream.scaladsl.{BroadcastHub, Keep, MergeHub, Sink, Source}
+import com.example.OkHttpInterceptor
 import com.example.dao.Logable
 import com.example.grpc.helloworld.{GreeterService, HelloReply, HelloRequest}
+import okhttp3.{Request, Response}
 
 import scala.concurrent.Future
 
@@ -23,8 +25,33 @@ class GreeterServiceImpl(system: ActorSystem[_]) extends GreeterService with Log
    */
   override def sayHello(in: HelloRequest): Future[HelloReply] = {
     logger.info("grpc server test log.............")
+    http2()
     Future.successful(HelloReply(s"Hello,${in.name}"))
   }
+
+  import okhttp3.OkHttpClient
+
+  val client = new OkHttpClient
+  .Builder()
+    //    .protocols(util.Arrays.asList(Protocol.H2_PRIOR_KNOWLEDGE))
+    .addInterceptor(new OkHttpInterceptor).build()
+
+  def http2(): String = {
+
+    val request: Request = new Request.Builder().url("https://www.baidu.com/").build()
+    val response: Response = null
+    try {
+      val response = client.newCall(request).execute
+      response.body.string
+    } catch {
+      case ex: Throwable =>
+        ex.printStackTrace()
+        ""
+    } finally {
+      if (response != null) response.close()
+    }
+  }
+
 
   /**
    * #service-request-reply
