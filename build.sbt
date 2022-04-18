@@ -9,6 +9,8 @@ fork := true
 
 enablePlugins(AkkaGrpcPlugin)
 
+val `kamon-version` = "2.5.1+12-0b51ebc2-dirty"
+
 lazy val root = (project in file(".")).
   enablePlugins(JavaAgent).
   settings(
@@ -16,7 +18,7 @@ lazy val root = (project in file(".")).
       organization := "com.example",
       scalaVersion := "2.12.15"
     )),
-    name := "akka-http-quickstart-scala",
+    name := "akka-monitor-demo",
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http2-support" % akkaHttpVersion,
@@ -33,18 +35,18 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
 
-
-      "io.github.mofei100" %% "kamon-core" % "2.5.3+6-ad66eb1a",
+      "io.kamon" %% "kamon-bundle" % "2.5.0",
+      "io.github.mofei100" %% "kamon-core" % `kamon-version`,
       "io.kamon" %% "kamon-akka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.kamon" %% "kamon-system-metrics" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.kamon" %% "kamon-executors" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.github.mofei100" %% "kamon-akka-http" % "2.5.3+3-adec246d" exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
+      "io.github.mofei100" %% "kamon-akka-http" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
       "io.kamon" %% "kamon-jdbc" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.kamon" %% "kamon-kafka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.kamon" %% "kamon-logback" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.kamon" %% "kamon-jaeger" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.kamon" %% "kamon-status-page" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.github.mofei100" %% "kamon-akka-grpc" % "2.5.3+7-ff6aa471" exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
+      "io.github.mofei100" %% "kamon-akka-grpc" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
       "io.kamon" %% "kamon-redis" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",
@@ -54,8 +56,6 @@ lazy val root = (project in file(".")).
       //redis
       "redis.clients" % "jedis" % "3.3.0",
       //okhttp
-      "com.squareup.okhttp3" % "okhttp" % "4.9.2"
-
-
+      "com.squareup.okhttp3" % "okhttp" % "4.9.2",
     )
   )

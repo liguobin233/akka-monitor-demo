@@ -70,7 +70,7 @@ object QuickstartApp {
 
   def initDb(): Database = {
     val driver = "com.mysql.cj.jdbc.Driver"
-    val server = "127.0.0.1:3318"
+    val server = "127.0.0.1:3306"
     val dbName = "trace"
 
     val parameters = Map(

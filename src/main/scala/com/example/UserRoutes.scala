@@ -1,18 +1,20 @@
 package com.example
 
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, StatusCodes }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.example.UserRegistry._
-import okhttp3.{Protocol, Request, Response}
+import okhttp3.{ Protocol, Request, Response }
 
 import java.util
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
+import kamon.Kamon
+import kamon.context.Context
 
 //#import-json-formats
 //#user-routes-class
@@ -61,6 +63,10 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
               Test.mysql()
               //akka actor
               val result = complete(getUsers())
+              // client
+              http()
+              val context = Kamon.currentContext().get[String](Context.key[String]("parentTraceId", "undefined"))
+              println(s"kamon context => $context")
               result
             },
             post {
@@ -116,7 +122,7 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
 
   def http2(): String = {
 
-    val request: Request = new Request.Builder().url("http://127.0.0.1:8080/users2").build()
+    val request: Request = new Request.Builder().url("http://127.0.0.1:8088/users2").build()
     val response: Response = null
     try {
       val response = client.newCall(request).execute
