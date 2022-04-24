@@ -1,20 +1,28 @@
 package com.example
 
-import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.{ ActorRef, ActorSystem }
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, StatusCodes }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.example.UserRegistry._
-import okhttp3.{ Protocol, Request, Response }
-
-import java.util
-import scala.concurrent.Future
-import scala.util.{ Failure, Success }
 import kamon.Kamon
 import kamon.context.Context
+import okhttp3.{ Protocol, Request, Response }
+import sttp.client3
+import sttp.client3.Identity
+import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
+import sttp.client3.quick._
+import sttp.client3.sprayJson.asJson
+import okhttp3.OkHttpClient
+
+import java.util
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration.Duration
+import scala.util.{ Failure, Success }
+import sttp.client3.ResponseException
 
 //#import-json-formats
 //#user-routes-class
@@ -47,64 +55,67 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
   //#all-routes
   //#users-get-post
   //#users-get-delete
-  val userRoutes: Route = {
-    pathPrefix("users2") {
-      concat(
-        //#users-get-delete
-        pathEnd {
-          concat(
-            get {
-              //trace日志
-              system.log.info("log test 4 traceId and spanId")
-              //http请求
-              system.log.info(s"http2:${http2()}")
-              //mysql
-              system.log.info("mysql")
-              Test.mysql()
-              //akka actor
-              val result = complete(getUsers())
-              // client
-              http()
-              val context = Kamon.currentContext().get[String](Context.key[String]("parentTraceId", "undefined"))
-              println(s"kamon context => $context")
-              result
-            },
-            post {
-              entity(as[User]) { user =>
-                onSuccess(createUser(user)) { performed =>
-                  complete((StatusCodes.Created, performed))
-                }
-              }
-            })
-        },
-        //#users-get-delete
-        //#users-get-post
-        path(Segment) { name =>
-          concat(
-            get {
-              //#retrieve-user-info
-              rejectEmptyResponse {
-                onSuccess(getUser(name)) { response =>
-                  complete(response.maybeUser)
-                }
-              }
-              //#retrieve-user-info
-            },
-            delete {
-              //#users-delete-logic
-              onSuccess(deleteUser(name)) { performed =>
-                complete((StatusCodes.OK, performed))
-              }
-              //#users-delete-logic
-            })
-        })
+  val userRoutes: Route =
+  pathPrefix("users2") {
+    concat(
       //#users-get-delete
-    }
+      pathEnd {
+        concat(
+          get {
+            //trace日志
+            system.log.info("log test 4 traceId and spanId")
+            //http请求
+            //              system.log.info(s"http2:${http2()}")
+            //mysql
+            system.log.info("mysql")
+            Test.mysql()
+            //akka actor
+            val result = complete(getUsers())
+            // akka http client
+            http()
+
+            // sttp
+            sttpClient()
+            asyncSttpClient()
+            val span = Kamon.currentSpan()
+            println(s"kamon currentSpan => ${span.id}")
+            result
+          },
+          post {
+            entity(as[User]) { user =>
+              onSuccess(createUser(user)) { performed =>
+                complete((StatusCodes.Created, performed))
+              }
+            }
+          })
+      },
+      //#users-get-delete
+      //#users-get-post
+      path(Segment) { name =>
+        concat(
+          get {
+            //#retrieve-user-info
+            rejectEmptyResponse {
+              onSuccess(getUser(name)) { response =>
+                complete(response.maybeUser)
+              }
+            }
+            //#retrieve-user-info
+          },
+          delete {
+            //#users-delete-logic
+            onSuccess(deleteUser(name)) { performed =>
+              complete((StatusCodes.OK, performed))
+            }
+            //#users-delete-logic
+          })
+      })
+    //#users-get-delete
   }
 
   def http(): Unit = {
-    Http().connectionTo("127.0.0.1").toPort(8081).http2()
-    val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(uri = "http://akka.io"))
+//    Http().connectionTo("127.0.0.1").toPort(8081).http2()
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(uri = "http://httpbin.org/ip"))
     implicit val executionContext = system.executionContext
     responseFuture
       .onComplete {
@@ -113,15 +124,12 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
       }
   }
 
-  import okhttp3.OkHttpClient
-
   val client = new OkHttpClient
   .Builder()
     .protocols(util.Arrays.asList(Protocol.H2_PRIOR_KNOWLEDGE))
     .addInterceptor(new OkHttpInterceptor).build()
 
   def http2(): String = {
-
     val request: Request = new Request.Builder().url("http://127.0.0.1:8088/users2").build()
     val response: Response = null
     try {
@@ -136,7 +144,19 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
     }
   }
 
+  def asyncSttpClient(): Unit = {
+    val backend = AsyncHttpClientFutureBackend()
+    val future: Future[client3.Response[Either[String, String]]] = basicRequest.get(uri"http://www.baidu.com").send(backend)
+    val ret = Await.result(future, Duration.Inf)
+    println(ret)
 
+  }
+
+  def sttpClient(): Unit = {
+    val s1: Identity[client3.Response[String]] = basicRequest.get(uri"http://httpbin.org/ip")
+      .response(asStringAlways).send(backend)
+    println(s1.body)
+  }
 
   //#all-routes
 }
