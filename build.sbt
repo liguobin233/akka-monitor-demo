@@ -9,7 +9,7 @@ fork := true
 
 enablePlugins(AkkaGrpcPlugin)
 
-val `kamon-version` = "2.5.0+7-abcdc634-dirty"
+val `kamon-version` = "2.5.1+12-0b51ebc2-dirty"
 
 lazy val root = (project in file(".")).
   enablePlugins(JavaAgent).
@@ -48,7 +48,7 @@ lazy val root = (project in file(".")).
       "io.kamon" %% "kamon-status-page" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.github.mofei100" %% "kamon-akka-grpc" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
       "io.kamon" %% "kamon-redis" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.github.mofei100" %% "kamon-sttp3" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12"),
+      "io.github.mofei100" %% "kamon-sttp-client3" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12"),
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
