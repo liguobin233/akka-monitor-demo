@@ -9,7 +9,7 @@ fork := true
 
 enablePlugins(AkkaGrpcPlugin)
 
-val `kamon-version` = "2.5.1+12-0b51ebc2-dirty"
+val `kamon-version` = "2.5.1+14-33e2fe55-dirty"
 
 lazy val root = (project in file(".")).
   enablePlugins(JavaAgent).
@@ -60,6 +60,7 @@ lazy val root = (project in file(".")).
       "com.squareup.okhttp3" % "okhttp" % "4.9.2",
       "com.softwaremill.sttp.client3" %% "core" % "3.5.2",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % "3.5.2",
-      "com.softwaremill.sttp.client3" %% "spray-json" % "3.5.2"
+      "com.softwaremill.sttp.client3" %% "spray-json" % "3.5.2",
+      "io.kamon"              %  "kanela-agent"    % "1.0.12"
     )
   )

@@ -146,14 +146,14 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
 
   def asyncSttpClient(): Unit = {
     val backend = AsyncHttpClientFutureBackend()
-    val future: Future[client3.Response[Either[String, String]]] = basicRequest.get(uri"http://www.baidu.com").send(backend)
+    val future: Future[client3.Response[Either[String, String]]] = basicRequest.get(uri"https://www.baidu.com").send(backend)
     val ret = Await.result(future, Duration.Inf)
     println(ret)
 
   }
 
   def sttpClient(): Unit = {
-    val s1: Identity[client3.Response[String]] = basicRequest.get(uri"http://httpbin.org/ip")
+    val s1: Identity[client3.Response[String]] = basicRequest.get(uri"https://github.com/")
       .response(asStringAlways).send(backend)
     println(s1.body)
   }
