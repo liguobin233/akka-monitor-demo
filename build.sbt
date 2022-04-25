@@ -9,7 +9,7 @@ fork := true
 
 enablePlugins(AkkaGrpcPlugin)
 
-val `kamon-version` = "2.5.1+14-33e2fe55-dirty"
+val `kamon-version` = "2.5.1+17-26edf68e"
 
 lazy val root = (project in file(".")).
   enablePlugins(JavaAgent).
