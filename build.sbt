@@ -35,7 +35,8 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
 
-      "io.kamon" %% "kamon-bundle" % "2.5.0",
+      // https://kamon.io/docs/latest/guides/how-to/start-with-the-kanela-agent/#running-from-sbt
+//      "io.kamon" %% "kamon-bundle" % "2.5.0", // 不用这种方式 使用agent
       "io.github.mofei100" %% "kamon-core" % `kamon-version`,
       "io.kamon" %% "kamon-akka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.kamon" %% "kamon-system-metrics" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
@@ -48,6 +49,7 @@ lazy val root = (project in file(".")).
       "io.kamon" %% "kamon-status-page" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.github.mofei100" %% "kamon-akka-grpc" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
       "io.kamon" %% "kamon-redis" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-prometheus" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.github.mofei100" %% "kamon-sttp-client3" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12"),
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",

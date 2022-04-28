@@ -39,6 +39,10 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
 
   def getUsers(): Future[Users] = {
     system.log.info("log test 4 traceId and spanId")
+    1 to 20000 foreach {
+      i:Int =>
+        userRegistry.ask(GetUsers)  
+    }
     userRegistry.ask(GetUsers)
   }
 
