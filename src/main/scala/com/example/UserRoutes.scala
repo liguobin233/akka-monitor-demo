@@ -3,26 +3,26 @@ package com.example
 import akka.actor.typed.{ ActorRef, ActorSystem }
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, StatusCodes }
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.stream.scaladsl.StreamConverters
 import akka.util.Timeout
 import com.example.UserRegistry._
+import io.prometheus.client.exporter.common.TextFormat
+import io.prometheus.client.CollectorRegistry
 import kamon.Kamon
-import kamon.context.Context
-import okhttp3.{ Protocol, Request, Response }
+import okhttp3.{ OkHttpClient, Protocol, Request, Response }
 import sttp.client3
 import sttp.client3.Identity
 import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
 import sttp.client3.quick._
-import sttp.client3.sprayJson.asJson
-import okhttp3.OkHttpClient
 
+import java.io.{ OutputStreamWriter, PipedInputStream, PipedOutputStream }
 import java.util
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
 import scala.util.{ Failure, Success }
-import sttp.client3.ResponseException
 
 //#import-json-formats
 //#user-routes-class
@@ -40,8 +40,8 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
   def getUsers(): Future[Users] = {
     system.log.info("log test 4 traceId and spanId")
     1 to 200 foreach {
-      i:Int =>
-        userRegistry.ask(GetUsers)  
+      i: Int =>
+        userRegistry.ask(GetUsers)
     }
     userRegistry.ask(GetUsers)
   }
@@ -115,10 +115,26 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
           })
       })
     //#users-get-delete
+  } ~ path("metrics") {
+    // Prometheus
+    complete {
+      import scala.concurrent.ExecutionContext.Implicits.global
+      val prometheusTextType =
+        MediaType.customWithFixedCharset("text", "plain", HttpCharsets.`UTF-8`, params = Map("version" -> "0.0.4"))
+      val in = new PipedInputStream
+      val out = new OutputStreamWriter(new PipedOutputStream(in), HttpCharsets.`UTF-8`.value)
+      val byteSource = StreamConverters.fromInputStream(() => in)
+      Future {
+        try TextFormat.write004(out, CollectorRegistry.defaultRegistry.metricFamilySamples())
+          // out.flush()
+        finally out.close()
+      }
+      HttpEntity(prometheusTextType, byteSource)
+    }
   }
 
   def http(): Unit = {
-//    Http().connectionTo("127.0.0.1").toPort(8081).http2()
+    //    Http().connectionTo("127.0.0.1").toPort(8081).http2()
     val responseFuture: Future[HttpResponse] = Http().singleRequest(HttpRequest(uri = "http://httpbin.org/ip"))
     implicit val executionContext = system.executionContext
     responseFuture

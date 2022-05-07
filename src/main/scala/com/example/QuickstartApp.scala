@@ -11,9 +11,10 @@ import com.typesafe.config.ConfigFactory
 import kamon.Kamon
 import org.apache.kafka.common.serialization.StringSerializer
 import slick.jdbc.JdbcBackend.Database
+import io.prometheus.client.hotspot.DefaultExports
 
 import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 //#main-class
 object QuickstartApp {
@@ -22,7 +23,7 @@ object QuickstartApp {
     // Akka HTTP still needs a classic ActorSystem to start
     import system.executionContext
 
-    val futureBinding = Http().newServerAt("localhost", 8088).bind(routes)
+    val futureBinding = Http().newServerAt("localhost", 9091).bind(routes)
     futureBinding.onComplete {
       case Success(binding) =>
         val address = binding.localAddress
@@ -41,6 +42,8 @@ object QuickstartApp {
   //#start-http-server
   def main(args: Array[String]): Unit = {
 
+    // prometheus client and provide a /metrics route
+    DefaultExports.initialize()
 
     //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>

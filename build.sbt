@@ -63,6 +63,10 @@ lazy val root = (project in file(".")).
       "com.softwaremill.sttp.client3" %% "core" % "3.5.2",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % "3.5.2",
       "com.softwaremill.sttp.client3" %% "spray-json" % "3.5.2",
-      "io.kamon"              %  "kanela-agent"    % "1.0.12"
+      "io.kamon"              %  "kanela-agent"    % "1.0.12",
+      "io.micrometer" % "micrometer-registry-prometheus" % "1.8.5",
+      "io.prometheus" % "simpleclient_httpserver" % "0.15.0",
+      "io.prometheus" % "simpleclient_hotspot" % "0.15.0",
+      "io.prometheus" % "simpleclient_common" % "0.15.0",
     )
   )
