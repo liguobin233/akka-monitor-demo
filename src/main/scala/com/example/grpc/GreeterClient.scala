@@ -23,7 +23,10 @@ object GreeterClient {
 
     val names = List("Alice", "Bob")
 
-    names.foreach(singleRequestReply)
+    while(true) {
+      Thread.sleep(2000)
+      names.foreach(singleRequestReply)
+    }
 
     def singleRequestReply(name: String): Unit = {
       println(s"Performing request: $name")
