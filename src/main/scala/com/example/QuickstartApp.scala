@@ -23,7 +23,7 @@ object QuickstartApp {
     // Akka HTTP still needs a classic ActorSystem to start
     import system.executionContext
 
-    val futureBinding = Http().newServerAt("localhost", 9091).bind(routes)
+    val futureBinding = Http().newServerAt("localhost", 8089).bind(routes)
     futureBinding.onComplete {
       case Success(binding) =>
         val address = binding.localAddress
@@ -41,6 +41,7 @@ object QuickstartApp {
 
   //#start-http-server
   def main(args: Array[String]): Unit = {
+    import akka.http.scaladsl.server.Directives._
 
     // prometheus client and provide a /metrics route
     DefaultExports.initialize()
@@ -52,7 +53,7 @@ object QuickstartApp {
       context.watch(userRegistryActor)
 
       val routes = new UserRoutes(userRegistryActor)(context.system)
-      startHttpServer(routes.userRoutes)(context.system)
+      startHttpServer(routes.userRoutes ~ WebsocketRoute.route)(context.system)
 
       Behaviors.empty
     }

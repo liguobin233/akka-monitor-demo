@@ -9,7 +9,7 @@ fork := true
 
 enablePlugins(AkkaGrpcPlugin)
 
-val `kamon-version` = "2.5.1+17-26edf68e"
+val `kamon-version` = "2.5.1+16-a04d75bc"
 
 lazy val root = (project in file(".")).
   enablePlugins(JavaAgent).
@@ -38,19 +38,21 @@ lazy val root = (project in file(".")).
       // https://kamon.io/docs/latest/guides/how-to/start-with-the-kanela-agent/#running-from-sbt
 //      "io.kamon" %% "kamon-bundle" % "2.5.0", // 不用这种方式 使用agent
       "io.github.mofei100" %% "kamon-core" % `kamon-version`,
-      "io.kamon" %% "kamon-akka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.kamon" %% "kamon-system-metrics" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.kamon" %% "kamon-executors" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.github.mofei100" %% "kamon-akka-http" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
-      "io.kamon" %% "kamon-jdbc" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.kamon" %% "kamon-kafka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.kamon" %% "kamon-logback" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.kamon" %% "kamon-jaeger" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.kamon" %% "kamon-status-page" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.github.mofei100" %% "kamon-akka-grpc" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
-      "io.kamon" %% "kamon-redis" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
-      "io.kamon" %% "kamon-prometheus" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       "io.github.mofei100" %% "kamon-sttp-client3" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12"),
+      "io.github.mofei100" %% "kamon-akka-grpc" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
+      "io.github.mofei100" %% "kamon-instrumentation-common" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") ,
+
+      "io.kamon" %% "kamon-akka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-system-metrics" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-executors" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-jdbc" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-kafka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-logback" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-jaeger" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-status-page" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-redis" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-prometheus" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
