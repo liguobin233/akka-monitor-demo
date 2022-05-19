@@ -18,13 +18,4 @@
 
 - database: `trace`
 - table: `asset`
-```sql
-CREATE TABLE IF NOT EXISTS `asset`(
-    `id` INT UNSIGNED AUTO_INCREMENT,
-   `assetId` VARCHAR(100) NOT NULL,
-   `assetCode` VARCHAR(100) NOT NULL,
-   `assetName` VARCHAR(100) NOT NULL,
-   `baseAssetCode` VARCHAR(100) NOT NULL,
-   PRIMARY KEY ( `id` )
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-```
+- init sql: `src/resources/init.sql`

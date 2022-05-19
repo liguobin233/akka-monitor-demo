@@ -9,16 +9,25 @@ fork := true
 
 enablePlugins(AkkaGrpcPlugin)
 
-val `kamon-version` = "2.5.1+16-a04d75bc"
+val `kamon-version` = "2.5.5"
 
 lazy val root = (project in file(".")).
-  enablePlugins(JavaAgent).
+  enablePlugins(JavaAgent, JavaServerAppPackaging, DockerPlugin).
   settings(
     inThisBuild(List(
       organization := "com.example",
       scalaVersion := "2.12.15"
     )),
+    Docker / packageName := packageName.value,
+    Docker / version := version.value,
+    dockerBaseImage := "openjdk",
     name := "akka-monitor-demo",
+    dockerExposedVolumes ++= Seq("/opt/docker"),
+    dockerExposedPorts := Seq(8087, 8080, 8089),
+    Compile / mainClass := Some("com.example.QuickstartApp"),
+    dockerEntrypoint := Seq(
+      "/opt/docker/bin/akka-monitor-demo" ,"--privileged=true"
+    ),
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http2-support" % akkaHttpVersion,
@@ -36,23 +45,23 @@ lazy val root = (project in file(".")).
       "org.scalatest" %% "scalatest" % "3.1.4" % Test,
 
       // https://kamon.io/docs/latest/guides/how-to/start-with-the-kanela-agent/#running-from-sbt
-//      "io.kamon" %% "kamon-bundle" % "2.5.0", // 不用这种方式 使用agent
+      //      "io.kamon" %% "kamon-bundle" % "2.5.0", // 不用这种方式 使用agent
       "io.github.mofei100" %% "kamon-core" % `kamon-version`,
       "io.github.mofei100" %% "kamon-akka-http" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
       "io.github.mofei100" %% "kamon-sttp-client3" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12"),
       "io.github.mofei100" %% "kamon-akka-grpc" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-akka_2.12"),
-      "io.github.mofei100" %% "kamon-instrumentation-common" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12") ,
+      "io.github.mofei100" %% "kamon-instrumentation-common" % `kamon-version` exclude("io.github.mofei100", "kamon-core_2.12"),
+      "io.github.mofei100" %% "kamon-akka" % `kamon-version` exclude("io.kamon", "kamon-core_2.12") exclude("io.github.mofei100", "kamon-scala-future_2.12"),
 
-      "io.kamon" %% "kamon-akka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-system-metrics" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-executors" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-jdbc" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-kafka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-logback" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-jaeger" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-status-page" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-redis" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
-      "io.kamon" %% "kamon-prometheus" % "2.5.0" exclude("io.kamon", "kamon-core_2.12") ,
+      "io.kamon" %% "kamon-system-metrics" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-executors" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-jdbc" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-kafka" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-logback" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-jaeger" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-status-page" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-redis" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
+      "io.kamon" %% "kamon-prometheus" % "2.5.0" exclude("io.kamon", "kamon-core_2.12"),
       //slick
       "com.typesafe.slick" %% "slick" % "3.3.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
@@ -65,7 +74,7 @@ lazy val root = (project in file(".")).
       "com.softwaremill.sttp.client3" %% "core" % "3.5.2",
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % "3.5.2",
       "com.softwaremill.sttp.client3" %% "spray-json" % "3.5.2",
-      "io.kamon"              %  "kanela-agent"    % "1.0.12",
+      "io.kamon" % "kanela-agent" % "1.0.12",
       "io.micrometer" % "micrometer-registry-prometheus" % "1.8.5",
       "io.prometheus" % "simpleclient_httpserver" % "0.15.0",
       "io.prometheus" % "simpleclient_hotspot" % "0.15.0",

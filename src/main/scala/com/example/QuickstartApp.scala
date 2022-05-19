@@ -12,6 +12,7 @@ import kamon.Kamon
 import org.apache.kafka.common.serialization.StringSerializer
 import slick.jdbc.JdbcBackend.Database
 import io.prometheus.client.hotspot.DefaultExports
+import com.example.config.MysqlConfig
 
 import scala.concurrent.ExecutionContext
 import scala.util.{ Failure, Success }
@@ -23,7 +24,8 @@ object QuickstartApp {
     // Akka HTTP still needs a classic ActorSystem to start
     import system.executionContext
 
-    val futureBinding = Http().newServerAt("localhost", 8089).bind(routes)
+    // 需要使用0.0.0.0
+    val futureBinding = Http().newServerAt("0.0.0.0", 8089).bind(routes)
     futureBinding.onComplete {
       case Success(binding) =>
         val address = binding.localAddress
@@ -73,10 +75,8 @@ object QuickstartApp {
   }
 
   def initDb(): Database = {
-    val driver = "com.mysql.cj.jdbc.Driver"
-    val server = "127.0.0.1:3306"
-    val dbName = "trace"
-
+    val conf = MysqlConfig.load()
+    val driver = conf.driver
     val parameters = Map(
       "cachePrepStmts" -> "true",
       "prepStmtCacheSize" -> "250",
@@ -93,18 +93,17 @@ object QuickstartApp {
       "useUnicode" -> "yes", // MySQL table has to be set to charset of utf family as well
       "characterEncoding" -> "UTF-8" // e.g. "alter table <TB> convert to CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
     ).map(a => s"${a._1}=${a._2}").mkString("&")
-    val url = s"jdbc:mysql://$server/$dbName?$parameters"
+    val url = s"${conf.url}?$parameters"
     val configMap = Map[String, Any](
       "dataSourceClass" -> "slick.jdbc.DriverDataSource",
       "driverClassName" -> driver,
-      "user" -> "root",
-      "password" -> "root",
+      "user" -> conf.user,
       "numThreads" -> 20,
       "properties.driver" -> driver,
       "properties.url" -> url,
       "connectionTimeout" -> 30000,
       "validationTimeout" -> 5000
-    )
+    ) ++ (if (conf.password.nonEmpty) Map("password" -> conf.password) else Map.empty)
     Database.forConfig("", ConfigFactory.parseMap(collection.JavaConverters.mapAsJavaMap(configMap)))
   }
 

@@ -39,10 +39,6 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
 
   def getUsers(): Future[Users] = {
     system.log.info("log test 4 traceId and spanId")
-    1 to 200 foreach {
-      i: Int =>
-        userRegistry.ask(GetUsers)
-    }
     userRegistry.ask(GetUsers)
   }
 
@@ -59,63 +55,73 @@ class UserRoutes(userRegistry: ActorRef[UserRegistry.Command])(implicit val syst
   //#all-routes
   //#users-get-post
   //#users-get-delete
-  val userRoutes: Route =
-  pathPrefix("users2") {
-    concat(
-      //#users-get-delete
-      pathEnd {
-        concat(
-          get {
-            //trace日志
-            system.log.info("log test 4 traceId and spanId")
-            //http请求
-            //              system.log.info(s"http2:${http2()}")
-            //mysql
-            system.log.info("mysql")
-            Test.mysql()
-            //akka actor
-            val result = complete(getUsers())
-            // akka http client
-            http()
+  // 容器中运行时，外面宿主机使用局域网的 192 IP访问
+  val userRoutes: Route = path("users1") {
+    get {
+      Test.mysql()
+      val result = complete(getUsers())
+      http()
+      val span = Kamon.currentSpan()
+      println(s"kamon currentSpan => ${span.id}")
+      result
+    }
+  } ~
+    pathPrefix("users2") {
+      concat(
+        //#users-get-delete
+        pathEnd {
+          concat(
+            get {
+              //trace日志
+              system.log.info("log test 4 traceId and spanId")
+              //http请求
+              //              system.log.info(s"http2:${http2()}")
+              //mysql
+              system.log.info("mysql")
+              Test.mysql()
+              //akka actor
+              val result = complete(getUsers())
+              // akka http client
+              http()
 
-            // sttp
-            sttpClient()
-            asyncSttpClient()
-            val span = Kamon.currentSpan()
-            println(s"kamon currentSpan => ${span.id}")
-            result
-          },
-          post {
-            entity(as[User]) { user =>
-              onSuccess(createUser(user)) { performed =>
-                complete((StatusCodes.Created, performed))
+              // sttp
+              sttpClient()
+              asyncSttpClient()
+              val span = Kamon.currentSpan()
+              println(s"kamon currentSpan => ${span.id}")
+              result
+            },
+            post {
+              entity(as[User]) { user =>
+                onSuccess(createUser(user)) { performed =>
+                  complete((StatusCodes.Created, performed))
+                }
               }
-            }
-          })
-      },
+            })
+        },
+        //#users-get-delete
+        //#users-get-post
+        path(Segment) { name =>
+          concat(
+            get {
+              //#retrieve-user-info
+              rejectEmptyResponse {
+                onSuccess(getUser(name)) { response =>
+                  complete(response.maybeUser)
+                }
+              }
+              //#retrieve-user-info
+            },
+            delete {
+              //#users-delete-logic
+              onSuccess(deleteUser(name)) { performed =>
+                complete((StatusCodes.OK, performed))
+              }
+              //#users-delete-logic
+            })
+        })
       //#users-get-delete
-      //#users-get-post
-      path(Segment) { name =>
-        concat(
-          get {
-            //#retrieve-user-info
-            rejectEmptyResponse {
-              onSuccess(getUser(name)) { response =>
-                complete(response.maybeUser)
-              }
-            }
-            //#retrieve-user-info
-          },
-          delete {
-            //#users-delete-logic
-            onSuccess(deleteUser(name)) { performed =>
-              complete((StatusCodes.OK, performed))
-            }
-            //#users-delete-logic
-          })
-      })
-    //#users-get-delete
-  } ~ path("metrics") {
+    } ~ path("metrics") {
     // Prometheus
     complete {
       import scala.concurrent.ExecutionContext.Implicits.global
