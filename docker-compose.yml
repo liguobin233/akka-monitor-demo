@@ -10,9 +10,17 @@ services:
       - mysqlserver
       - cadvisor
       - redisserver
+      - nodeexporter
     ports:
       - "8089:8089"
   
+  nodeexporter:
+    image: prom/node-exporter:latest
+    container_name: monitoring_node_exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+      
   mysqlserver:
     image: mysql:oracle
     restart: always
