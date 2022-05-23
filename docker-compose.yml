@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   prometheus:
     image: prom/prometheus:latest
@@ -12,7 +12,7 @@ services:
     depends_on:
       - cadvisor
       - nodeexporter
-      
+  
   # 指定服务名称
   demo:
     # 指定服务使用的镜像
@@ -22,6 +22,7 @@ services:
     depends_on:
       - mysqlserver
       - redisserver
+      - nodeexporter
     ports:
       - "8089:8089"
   
@@ -31,7 +32,7 @@ services:
     restart: unless-stopped
     ports:
       - "9100:9100"
-      
+  
   mysqlserver:
     image: mysql:oracle
     restart: always
@@ -58,8 +59,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
-      
-      
+  
   cadvisor:
     image: zcube/cadvisor:latest
     privileged: true
@@ -72,6 +72,8 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /etc/machine-id:/etc/machine-id:ro
       - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
+      # name label
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - "8080:8080"
     depends_on:
