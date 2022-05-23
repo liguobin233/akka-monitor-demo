@@ -1,5 +1,18 @@
 version: '3'
 services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ~/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - cadvisor
+      - nodeexporter
+      
   # 指定服务名称
   demo:
     # 指定服务使用的镜像
@@ -8,15 +21,13 @@ services:
     container_name: demo
     depends_on:
       - mysqlserver
-      - cadvisor
       - redisserver
-      - nodeexporter
     ports:
       - "8089:8089"
   
   nodeexporter:
     image: prom/node-exporter:latest
-    container_name: monitoring_node_exporter
+    container_name: nodeexporter
     restart: unless-stopped
     ports:
       - "9100:9100"
@@ -24,7 +35,7 @@ services:
   mysqlserver:
     image: mysql:oracle
     restart: always
-    container_name: mysql_server
+    container_name: mysqlserver
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
@@ -39,7 +50,7 @@ services:
   
   redisserver:
     image: redis
-    container_name: redis_server
+    container_name: redisserver
     volumes:
       - /opt/homebrew/var/db/redis/datadir:/data
       - /opt/homebrew/var/db/redis/redis.conf:/usr/local/etc/redis/redis.conf
@@ -51,12 +62,19 @@ services:
       
   cadvisor:
     image: zcube/cadvisor:latest
-    container_name: monitoring_cadvisor
+    privileged: true
+    container_name: cadvisor
     restart: unless-stopped
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro      
     ports:
-      - "8080:8080"  
+      - "8080:8080"
+    depends_on:
+      - mysqlserver
+      - redisserver
+      - demo        
