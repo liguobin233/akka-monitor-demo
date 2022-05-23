@@ -71,10 +71,10 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /etc/machine-id:/etc/machine-id:ro
-      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro      
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
     ports:
       - "8080:8080"
     depends_on:
       - mysqlserver
       - redisserver
-      - demo        
+      - demo    
