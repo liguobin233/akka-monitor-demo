@@ -2,6 +2,14 @@ version: '3.8'
 services:
   prometheus:
     image: prom/prometheus:latest
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+        reservations:
+          cpus: "0.5"
+          memory: 128M    
     container_name: prometheus
     ports:
       - "9090:9090"
@@ -17,6 +25,14 @@ services:
   demo:
     # 指定服务使用的镜像
     image: akka-monitor-demo:0.1.0-SNAPSHOT
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
     # 指定容器名称
     container_name: demo
     depends_on:
@@ -28,6 +44,14 @@ services:
   
   nodeexporter:
     image: prom/node-exporter:latest
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+        reservations:
+          cpus: "0.5"
+          memory: 128M    
     container_name: nodeexporter
     restart: unless-stopped
     ports:
@@ -35,6 +59,14 @@ services:
   
   mysqlserver:
     image: mysql:oracle
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
     restart: always
     container_name: mysqlserver
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -51,6 +83,14 @@ services:
   
   redisserver:
     image: redis
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 256M    
     container_name: redisserver
     volumes:
       - /opt/homebrew/var/db/redis/datadir:/data
@@ -62,6 +102,14 @@ services:
   
   cadvisor:
     image: zcube/cadvisor:latest
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+        reservations:
+          cpus: "0.5"
+          memory: 128M
     privileged: true
     container_name: cadvisor
     restart: unless-stopped
